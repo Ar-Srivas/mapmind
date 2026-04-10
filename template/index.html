@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ETA Predictor</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+</head>
+
+<body>
+
+<div class="container">
+
+  <!-- LEFT PANEL -->
+  <div class="left-panel">
+
+    <h2>Delivery ETA</h2>
+
+    <div class="form">
+
+      <h3>Delivery Settings</h3>
+
+      <label>Delivery Address:</label>
+      <input type="text" id="address" placeholder="Enter address (e.g. Andheri West Mumbai)">
+
+      <label>Weather:</label>
+      <select id="weather">
+        <option>Clear</option>
+        <option>Rainy</option>
+        <option>Foggy</option>
+        <option>Windy</option>
+      </select>
+
+      <label>Traffic:</label>
+      <select id="traffic">
+        <option>Low</option>
+        <option>Medium</option>
+        <option>High</option>
+      </select>
+
+      <label>Time of Day:</label>
+      <select id="time">
+        <option>Morning</option>
+        <option>Afternoon</option>
+        <option>Evening</option>
+        <option>Night</option>
+      </select>
+
+      <label>Vehicle:</label>
+      <select id="vehicle">
+        <option>Bike</option>
+        <option>Scooter</option>
+        <option>Car</option>
+      </select>
+
+      <label>Order Type:</label>
+      <select id="order">
+        <option>Snack</option>
+        <option>Meal</option>
+        <option>Drinks</option>
+        <option>Buffet</option>
+      </select>
+
+      <label>Courier Age:</label>
+      <input type="number" id="age" value="30">
+
+      <label>Courier Rating:</label>
+      <input type="number" id="rating" value="4.5" step="0.1">
+
+      <label>Preparation Time (min):</label>
+      <input type="number" id="prep" value="15">
+
+      <label>Courier Experience (yrs):</label>
+      <input type="number" id="exp" value="3">
+
+    </div>
+
+    <button onclick="predict()">Check Delivery Time</button>
+
+    <!-- RESULTS TABLE -->
+    <table class="results-table">
+      <tr>
+        <th>Model</th>
+        <th>ETA (min)</th>
+      </tr>
+      <tr>
+        <td>SVR (Dataset 1)</td>
+        <td id="svr1">--</td>
+      </tr>
+      <tr>
+        <td>RF (Dataset 1)</td>
+        <td id="rf1">--</td>
+      </tr>
+      <tr>
+        <td>SVR (Dataset 2)</td>
+        <td id="svr2">--</td>
+      </tr>
+      <tr>
+        <td>RF (Dataset 2)</td>
+        <td id="rf2">--</td>
+      </tr>
+    </table>
+
+    <p><b>Distance:</b> <span id="distance">--</span> km</p>
+    <p><b>Zone:</b> <span id="zone">--</span></p>
+
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+    <div id="map"></div>
+  </div>
+
+</div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="/static/script.js"></script>
+
+</body>
+</html>

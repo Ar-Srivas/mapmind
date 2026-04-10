@@ -1,0 +1,91 @@
+body {
+  font-family: Arial;
+  background: #f5f5f5;
+  margin: 0;
+}
+
+/* Main layout */
+.container {
+  display: flex;
+  height: 100vh;
+}
+
+/* LEFT PANEL (controls + results) */
+.left-panel {
+  width: 35%;
+  padding: 20px;
+  background: white;
+  overflow-y: auto;
+  box-shadow: 2px 0 8px rgba(0,0,0,0.05);
+}
+
+/* RIGHT PANEL (map) */
+.right-panel {
+  width: 65%;
+}
+
+#map {
+  height: 100%;
+  width: 100%;
+}
+
+/* Headings */
+h2 {
+  margin-top: 0;
+}
+
+/* Form styling */
+.form {
+  margin-top: 20px;
+}
+
+.form label {
+  display: block;
+  margin-top: 12px;
+  font-weight: bold;
+}
+
+.form select,
+.form input {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+/* Button */
+button {
+  margin-top: 20px;
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  background: #ff4d4d;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* Results table */
+.results-table {
+  margin-top: 25px;
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.results-table th,
+.results-table td {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+}
+
+.results-table th {
+  background: #f0f0f0;
+}
+
+.highlight {
+  font-weight: bold;
+  color: #ff4d4d;
+}

@@ -19,31 +19,48 @@
 
       <h3>Delivery Settings</h3>
 
+      <label>Store Address:</label>
+      <input type="text" id="store_address" placeholder="Enter store address (default: Bandra West Mumbai)">
+
       <label>Delivery Address:</label>
       <input type="text" id="address" placeholder="Enter address (e.g. Andheri West Mumbai)">
 
-      <label>Weather:</label>
-      <select id="weather">
-        <option>Clear</option>
-        <option>Rainy</option>
-        <option>Foggy</option>
-        <option>Windy</option>
+      <label>Context Mode:</label>
+      <select id="context_mode">
+        <option value="auto" selected>Auto fetch</option>
+        <option value="manual">Manual input</option>
       </select>
 
-      <label>Traffic:</label>
-      <select id="traffic">
-        <option>Low</option>
-        <option>Medium</option>
-        <option>High</option>
-      </select>
+      <div id="auto_context">
+        <p><b>Weather (auto):</b> <span id="weather_auto">--</span></p>
+        <p><b>Traffic (auto):</b> <span id="traffic_auto">--</span></p>
+        <p><b>Time of Day (auto):</b> <span id="time_auto">--</span></p>
+      </div>
 
-      <label>Time of Day:</label>
-      <select id="time">
-        <option>Morning</option>
-        <option>Afternoon</option>
-        <option>Evening</option>
-        <option>Night</option>
-      </select>
+      <div id="manual_context" style="display:none;">
+        <label>Weather (manual):</label>
+        <select id="weather_manual">
+          <option>Clear</option>
+          <option>Rainy</option>
+          <option>Foggy</option>
+          <option>Windy</option>
+        </select>
+
+        <label>Traffic (manual):</label>
+        <select id="traffic_manual">
+          <option>Low</option>
+          <option>Medium</option>
+          <option>High</option>
+        </select>
+
+        <label>Time of Day (manual):</label>
+        <select id="time_manual">
+          <option>Morning</option>
+          <option>Afternoon</option>
+          <option>Evening</option>
+          <option>Night</option>
+        </select>
+      </div>
 
       <label>Vehicle:</label>
       <select id="vehicle">
@@ -101,6 +118,7 @@
     </table>
 
     <p><b>Distance:</b> <span id="distance">--</span> km</p>
+    <p><b>Store:</b> <span id="store_used">--</span></p>
     <p><b>Zone:</b> <span id="zone">--</span></p>
 
   </div>
@@ -113,7 +131,7 @@
 </div>
 
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-<script src="/static/script.js"></script>
+<script src="/static/script.js?v=5"></script>
 
 </body>
 </html>

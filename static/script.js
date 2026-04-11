@@ -1,21 +1,68 @@
 let selectedLat = null;
 let selectedLng = null;
 
-const restaurant = [19.0596, 72.8295];
+console.log("[script] loaded v5");
+
+let restaurant = [19.0596, 72.8295];
+let restaurantMarker = null;
 
 var map = L.map('map').setView(restaurant, 12);
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')
 .addTo(map);
 
-// Restaurant marker
-L.marker(restaurant).addTo(map)
-.bindPopup("Store Location")
-.openPopup();
+function renderRestaurantMarker(lat, lng) {
+    restaurant = [lat, lng];
+
+    if (restaurantMarker) {
+        map.removeLayer(restaurantMarker);
+    }
+
+    restaurantMarker = L.marker(restaurant).addTo(map)
+        .bindPopup("Store Location")
+        .openPopup();
+}
+
+renderRestaurantMarker(restaurant[0], restaurant[1]);
 
 let userMarker = null;
 let line = null;
 let zoneCircle = null;
+
+function getEl(id) {
+    return document.getElementById(id);
+}
+
+function getRequiredValue(id) {
+    const el = getEl(id);
+    if (!el) {
+        throw new Error(`Missing element: ${id}`);
+    }
+    return el.value;
+}
+
+function setContextModeUI() {
+    const modeEl = getEl("context_mode");
+    const autoBlock = getEl("auto_context");
+    const manualBlock = getEl("manual_context");
+    if (!modeEl || !manualBlock || !autoBlock) {
+        console.warn("[ui] context mode elements not found");
+        return;
+    }
+    const mode = modeEl.value;
+    autoBlock.style.display = mode === "auto" ? "block" : "none";
+    manualBlock.style.display = mode === "manual" ? "block" : "none";
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    const modeSelect = getEl("context_mode");
+    if (modeSelect) {
+        modeSelect.addEventListener("change", setContextModeUI);
+    } else {
+        console.warn("[ui] context_mode not found on DOMContentLoaded");
+    }
+    setContextModeUI();
+});
 
 function getZoneColor(zone) {
     if (zone === "fast") return "#22c55e";
@@ -52,30 +99,49 @@ map.on('click', function(e) {
 
 // Predict function
 async function predict() {
+    console.log("[predict] button clicked");
 
-    const address = document.getElementById("address").value.trim();
+    let data;
+    try {
+        const address = getRequiredValue("address").trim();
+        const storeAddress = getRequiredValue("store_address").trim();
+        console.log("[predict] address:", address);
 
-    if (!address) {
-        alert("Enter an address");
+        if (!address) {
+            console.warn("[predict] missing address");
+            alert("Enter an address");
+            return;
+        }
+
+        const contextMode = (getEl("context_mode")?.value || "auto");
+
+        data = {
+            store_address: storeAddress,
+            address: address,
+            context_mode: contextMode,
+            Vehicle_Type: getRequiredValue("vehicle"),
+
+            Preparation_Time_min: parseFloat(getRequiredValue("prep")),
+            Courier_Experience_yrs: parseFloat(getRequiredValue("exp")),
+
+            Delivery_person_Age: parseFloat(getRequiredValue("age")),
+            Delivery_person_Ratings: parseFloat(getRequiredValue("rating")),
+            Type_of_order: getRequiredValue("order"),
+            Type_of_vehicle: getRequiredValue("vehicle").toLowerCase()
+        };
+
+        if (data.context_mode === "manual") {
+            data.Weather = getRequiredValue("weather_manual");
+            data.Traffic_Level = getRequiredValue("traffic_manual");
+            data.Time_of_Day = getRequiredValue("time_manual");
+        }
+    } catch (err) {
+        console.error("[predict] input/DOM error:", err);
+        alert(err.message || "Missing input field in page.");
         return;
     }
 
-    let data = {
-        address: address,
-
-        Weather: document.getElementById("weather").value,
-        Traffic_Level: document.getElementById("traffic").value,
-        Time_of_Day: document.getElementById("time").value,
-        Vehicle_Type: document.getElementById("vehicle").value,
-
-        Preparation_Time_min: parseFloat(document.getElementById("prep").value),
-        Courier_Experience_yrs: parseFloat(document.getElementById("exp").value),
-
-        Delivery_person_Age: parseFloat(document.getElementById("age").value),
-        Delivery_person_Ratings: parseFloat(document.getElementById("rating").value),
-        Type_of_order: document.getElementById("order").value,
-        Type_of_vehicle: document.getElementById("vehicle").value.toLowerCase()
-    };
+    console.log("[predict] payload:", data);
 
     try {
         let res = await fetch("/predict", {
@@ -84,7 +150,15 @@ async function predict() {
             body: JSON.stringify(data)
         });
 
+        console.log("[predict] response status:", res.status);
+
         let result = await res.json();
+        console.log("[predict] response body:", result);
+
+        if (!res.ok) {
+            alert(result.error || "Prediction failed");
+            return;
+        }
 
         if (result.error) {
             alert(result.error);
@@ -93,6 +167,7 @@ async function predict() {
 
         // Update UI
         document.getElementById("distance").innerText = result.distance;
+        document.getElementById("store_used").innerText = result.store_label || `${result.store_lat}, ${result.store_lng}`;
 
         document.getElementById("svr1").innerText = result.svr_dataset1;
         document.getElementById("rf1").innerText  = result.rf_dataset1;
@@ -100,12 +175,20 @@ async function predict() {
         document.getElementById("svr2").innerText = result.svr_dataset2;
         document.getElementById("rf2").innerText  = result.rf_dataset2;
         document.getElementById("zone").innerText = result.delivery_zone;
+        document.getElementById("weather_auto").innerText = result.weather;
+        document.getElementById("traffic_auto").innerText = result.traffic_level;
+        document.getElementById("time_auto").innerText = result.time_of_day;
+
+        if (typeof result.store_lat === "number" && typeof result.store_lng === "number") {
+            renderRestaurantMarker(result.store_lat, result.store_lng);
+        }
 
         renderRoute(result.lat, result.lng, result.delivery_zone);
         map.setView([result.lat, result.lng], 13);
+        console.log("[predict] UI updated successfully");
 
     } catch (err) {
-        console.error(err);
-        alert("Error getting prediction");
+        console.error("[predict] request failed:", err);
+        alert("Error getting prediction. Check backend logs.");
     }
 }
